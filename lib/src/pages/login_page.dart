@@ -1,8 +1,11 @@
-import 'package:chatapp/src/widgets/button_blue.dart';
 import 'package:flutter/material.dart';
+import 'package:chatapp/src/services/auth_service.dart';
+import 'package:chatapp/src/widgets/button_blue.dart';
 import 'package:chatapp/src/widgets/labels_login.dart';
 import 'package:chatapp/src/widgets/logo_login.dart';
 import 'package:chatapp/src/widgets/custom_input.dart';
+import 'package:provider/provider.dart';
+import 'package:chatapp/src/helpers/mostrar_alerta.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -46,6 +49,7 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 50),
       child: Column(
@@ -59,17 +63,28 @@ class _FormState extends State<_Form> {
           ),
           CustomInput(
             icon: Icons.lock,
-            placeholder: 'Corre Electrónico',
+            placeholder: 'Password',
             keyboardType: TextInputType.emailAddress,
             textController: passwordCtrl,
             isPassword: true,
           ),
           ButtonBlue(
             text: 'Ingrese',
-            onPressed: () {
-              print(emailCtrl.text);
-              print(passwordCtrl.text);
-            },
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
+                    final loginOk = await authService.login(
+                        emailCtrl.text.trim(), passwordCtrl.text.trim());
+                    if (loginOk) {
+                      // conectar a nuestro socket server
+                      // navegar a otra pantalla
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      mostraralerta(context, 'Login Incorrecto',
+                          'Revise sus credenciales nuevamente');
+                    }
+                  },
           ),
         ],
       ),

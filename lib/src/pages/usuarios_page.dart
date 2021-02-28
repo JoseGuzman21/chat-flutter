@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:chatapp/src/models/usuarios.dart';
+import 'package:chatapp/src/services/auth_service.dart';
 
 class UsuariosPage extends StatefulWidget {
   @override
@@ -18,20 +20,28 @@ RefreshController _refreshController = RefreshController(initialRefresh: false);
 class _UsuariosPageState extends State<UsuariosPage> {
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final usuario = authService.usuario;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mi nombre', style: TextStyle(color: Colors.black87)),
+        centerTitle: true,
+        title: Text(usuario.nombre, style: TextStyle(color: Colors.black87)),
         elevation: 1,
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.exit_to_app, color: Colors.black87),
-          onPressed: () {},
+          onPressed: () {
+            // TODO: desconectarnos del socket server
+            Navigator.pushReplacementNamed(context, 'login');
+            AuthService.deleteToken();
+          },
         ),
         actions: [
           Container(
             margin: EdgeInsets.only(right: 10),
-            // child: Icon(Icons.check_circle, color: Colors.blue[400]),
-            child: Icon(Icons.offline_bolt, color: Colors.red[400]),
+            child: Icon(Icons.check_circle, color: Colors.blue[400]),
+            // child: Icon(Icons.offline_bolt, color: Colors.red[400]),
           )
         ],
       ),

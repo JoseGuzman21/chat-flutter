@@ -1,4 +1,7 @@
+import 'package:chatapp/src/helpers/mostrar_alerta.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:chatapp/src/services/auth_service.dart';
 import 'package:chatapp/src/widgets/button_blue.dart';
 import 'package:chatapp/src/widgets/labels_login.dart';
 import 'package:chatapp/src/widgets/logo_login.dart';
@@ -47,6 +50,8 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 50),
       child: Column(
@@ -74,10 +79,22 @@ class _FormState extends State<_Form> {
           ),
           ButtonBlue(
             text: 'Ingrese',
-            onPressed: () {
-              print(emailCtrl.text);
-              print(passwordCtrl.text);
-            },
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    print(emailCtrl.text);
+                    print(passwordCtrl.text);
+                    FocusScope.of(context).unfocus();
+                    final registroOk = await authService.registro(
+                        nameCtrl.text.trim(),
+                        emailCtrl.text.trim(),
+                        passwordCtrl.text.trim());
+                    if (registroOk == true) {
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      mostraralerta(context, 'Registro Incorrecto', registroOk);
+                    }
+                  },
           ),
         ],
       ),
