@@ -1,3 +1,4 @@
+import 'package:chatapp/src/services/socket_service.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/src/services/auth_service.dart';
 import 'package:chatapp/src/widgets/button_blue.dart';
@@ -50,6 +51,8 @@ class _FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 50),
       child: Column(
@@ -78,7 +81,7 @@ class _FormState extends State<_Form> {
                         emailCtrl.text.trim(), passwordCtrl.text.trim());
                     if (loginOk) {
                       // conectar a nuestro socket server
-                      // navegar a otra pantalla
+                      socketService.connect();
                       Navigator.pushReplacementNamed(context, 'usuarios');
                     } else {
                       mostraralerta(context, 'Login Incorrecto',
